@@ -21,6 +21,16 @@ security:
         main:
             lazy: true
             provider: database_users
+            form_login:
+                login_path: app_login
+                check_path: app_login 
+                default_target_path: app_dashboard
+                form_only: true
+                username_parameter: email
+                password_parameter: password
+            logout:
+                path: app_logout
+                target: app_login
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#the-firewall
@@ -33,6 +43,11 @@ security:
     access_control:
     # - { path: ^/admin, roles: ROLE_ADMIN }
     # - { path: ^/profile, roles: ROLE_USER }
+        #  Routes publiques
+        - { path: ^/login, roles: PUBLIC_ACCESS }
+
+        # Toutes les autres routes nécessitent d’être connecté
+        - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
     security:
