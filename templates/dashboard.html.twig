@@ -2,6 +2,13 @@
 
 {% block title %}Dashboard{% endblock %}
 
+{% block js %}
+    {{ parent() }}
+    <!-- Page  JS files -->
+    <script src="{{ asset('assets/js/dashboard.js') }}"></script>
+    <!-- /theme JS files -->
+{% endblock %}
+
 {% block body_class %}navbar-top bg-secondary{% endblock %}
 
 {% block body %}
@@ -50,11 +57,21 @@
 							Reconnect Beneficiaries
 							<span class="font-size-base ml-2">- Not persisted</span>
 						</h5>
+						<div class="header-elements">
+							<form action="javascript:;">
+								<div class="form-group-feedback form-group-feedback-right">
+									<input type="search" id="search-non-persisted" class="form-control text-white wmin-200" placeholder="Search...">
+									<div class="form-control-feedback">
+										<i class="icon-search4 font-size-base text-muted"></i>
+									</div>
+								</div>
+							</form>
+						</div>
 					</div>
 					<div class="card-body">
 						<div class="row">
 							{% for beneficiary in nonPersistedBeneficiaries %}
-								<div class="col-xl-2 col-sm-6">
+								<div class="col-xl-2 col-sm-6 beneficiary-non-persisted" data-name="{{ beneficiary.firstName|lower }}">
 									<div class="card">
 										<div class="card-body text-center">
 											<div class="card-img-actions d-inline-block mb-3">
