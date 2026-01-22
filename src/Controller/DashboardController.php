@@ -33,6 +33,7 @@ final class DashboardController extends AbstractController
         }
 
         return $this->render('dashboard.html.twig', [
+            'avatarEndpoint' => $avatarEndpoint,
             'nonPersistedBeneficiaries' => $nonPersistedBeneficiaries,
         ]);
     }
