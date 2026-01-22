@@ -45,8 +45,10 @@ security:
     # - { path: ^/profile, roles: ROLE_USER }
         #  Routes publiques
         - { path: ^/login, roles: PUBLIC_ACCESS }
+        - { path: ^/api/docs, roles: PUBLIC_ACCESS }
 
         # Toutes les autres routes nécessitent d’être connecté
+        - { path: ^/api, roles: IS_AUTHENTICATED_FULLY }
         - { path: ^/, roles: IS_AUTHENTICATED_FULLY }
 
 when@test:
