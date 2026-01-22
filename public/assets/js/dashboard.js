@@ -13,23 +13,23 @@ function SearchNonPersistedBeneficiaries() {
 
     searchBar.addEventListener('input', (e) => {
         const search = e.target.value.toLowerCase();
-        
+
         beneficiaries.forEach(beneficiary => {
             const name = beneficiary.dataset.name;
-                if (name.includes(search)) {
-                    beneficiary.style.opacity = '0';
-                    beneficiary.style.display = '';
-                    setTimeout(() => {
-                        beneficiary.style.transition = 'opacity 0.3s ease-in-out';
-                        beneficiary.style.opacity = '1';
-                    }, 10);
-                } else {
+            if (name.includes(search)) {
+                beneficiary.style.opacity = '0';
+                beneficiary.style.display = '';
+                setTimeout(() => {
                     beneficiary.style.transition = 'opacity 0.3s ease-in-out';
-                    beneficiary.style.opacity = '0';
-                    setTimeout(() => {
-                        beneficiary.style.display = 'none';
-                    }, 300);
-                }
+                    beneficiary.style.opacity = '1';
+                }, 10);
+            } else {
+                beneficiary.style.transition = 'opacity 0.3s ease-in-out';
+                beneficiary.style.opacity = '0';
+                setTimeout(() => {
+                    beneficiary.style.display = 'none';
+                }, 300);
+            }
         });
     });
 }
