@@ -3,6 +3,8 @@
 namespace App\Tests\Controller;
 
 use App\Entity\User;
+use App\Entity\Beneficiary;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 final class DashboardControllerTest extends WebTestCase
@@ -56,5 +58,67 @@ final class DashboardControllerTest extends WebTestCase
         $this->assertIsArray($data);
         $this->assertArrayHasKey('member', $data);
         $this->assertIsArray($data['member']);
+    }
+
+    /**
+     * Test deletion of a beneficiary from dashboard modal
+     * 
+     * @return void
+     */
+    public function testDeleteBeneficiaryFromDashboardModal(): void
+    {
+        $client = static::createClient();
+
+        $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
+        $testUser = $userRepository->findOneBy(['email' => 'tester@gmail.com']);
+
+        $this->assertNotNull($testUser, 'Test user not found: ensure fixtures create tester@gmail.com');
+
+        $client->loginUser($testUser);
+
+        // Create a beneficiary to delete
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $beneficiary = new Beneficiary();
+        $beneficiary->setName('Test Beneficiary to Delete');
+        $beneficiary->setCreatorEmail($testUser->getUserIdentifier());
+        $beneficiary->setCreatedAt(new \DateTimeImmutable());
+
+        $em->persist($beneficiary);
+        $em->flush();
+
+        $beneficiaryId = $beneficiary->getId();
+        $this->assertNotNull($beneficiaryId);
+
+        // Load dashboard and assert modal + form exist
+        $crawler = $client->request('GET', '/');
+        $this->assertResponseIsSuccessful();
+
+        $this->assertSelectorExists('#modal_beneficiary_deletion');
+        $this->assertSelectorExists('#beneficiary-delete-form');
+        $this->assertSelectorExists('#beneficiary-delete-id');
+        $this->assertSelectorExists('#beneficiary-delete-name');
+
+        // Submit the real delete form rendered in the modal (CSRF included in HTML)
+        $form = $crawler->selectButton('Confirm')->form([
+            'form[id]' => $beneficiaryId,
+        ]);
+
+        $client->submit($form);
+        $this->assertResponseRedirects();
+        
+        // Follow redirect back to dashboard
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+
+        // Check flash message
+        $crawler = $client->getCrawler();
+        $this->assertSelectorExists('#flash-messages');
+        $success = $crawler->filter('#flash-messages')->attr('data-success');
+        $this->assertStringContainsString('Beneficiary deleted successfully.', $success);
+
+        $em->clear();
+        $deleted = $em->getRepository(Beneficiary::class)->find($beneficiaryId);
+        $this->assertNull($deleted, 'Beneficiary should be deleted after submitting dashboard delete form');
     }
 }
