@@ -25,6 +25,14 @@ class Beneficiary
     #[Groups(['beneficiary:read', 'beneficiary:write'])]
     private $name;
 
+    #[ORM\Column(type: "string", length: 180, nullable: true)]
+    #[Groups(['beneficiary:read'])]
+    private ?string $creatorEmail = null;
+
+    #[ORM\Column(type: "datetime_immutable", nullable: true)]
+    #[Groups(['beneficiary:read'])]
+    private ?\DateTimeImmutable $createdAt = null;    
+
     public function getId(): ?int
     {
         return $this->id;
@@ -38,6 +46,30 @@ class Beneficiary
     public function setName(string $name): self
     {
         $this->name = $name;
+
+        return $this;
+    }
+
+    public function getCreatorEmail(): ?string
+    {
+        return $this->creatorEmail;
+    }
+
+    public function setCreatorEmail(string $creatorEmail): self
+    {
+        $this->creatorEmail = $creatorEmail;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    {
+        $this->createdAt = $createdAt;
 
         return $this;
     }
