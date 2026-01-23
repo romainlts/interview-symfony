@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\ApiFilter;
+use ApiPlatform\Doctrine\Orm\Filter\SearchFilter;
 use App\Repository\BeneficiaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -13,6 +15,7 @@ use Symfony\Component\Validator\Constraints as Assert;
     normalizationContext: ['groups' => ['beneficiary:read']],
     denormalizationContext: ['groups' => ['beneficiary:write']]
 )]
+#[ApiFilter(SearchFilter::class, properties: ['name' => 'partial'])]
 #[ORM\Entity(repositoryClass: BeneficiaryRepository::class)]
 class Beneficiary
 {
