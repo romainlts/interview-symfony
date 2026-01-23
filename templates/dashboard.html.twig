@@ -115,6 +115,7 @@
 				</div>
 				<!-- /Beneficiaries in database -->
 
+				<!-- Modal for adding new beneficiary -->
 				<div id="modal_form_vertical" class="modal fade" tabindex="-1">
 					<div class="modal-dialog">
 						<div class="modal-content">
@@ -139,6 +140,34 @@
 						</div>
 					</div>
 				</div>
+				<!-- /modal for adding new beneficiary -->
+
+				<!-- Modal for beneficiary deletion -->
+				<div id="modal_beneficiary_deletion" class="modal fade" tabindex="-1">
+					<div class="modal-dialog">
+						<div class="modal-content">
+							<div class="modal-header">
+								<h5 class="modal-title">Beneficiary deletion</h5>
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+							</div>
+ 						    {{ form_start(beneficiaryDeleteForm, { attr: { id: 'beneficiary-delete-form', novalidate: 'novalidate' } }) }}
+							    {{ form_widget(beneficiaryDeleteForm.id, { id: 'beneficiary-delete-id', type: 'hidden' }) }}
+							    <div class="modal-body">
+								    <div class="bootbox-body">
+										Are you sure you want to delete 
+										<span id="beneficiary-delete-name" class="font-weight-bold">this beneficiary</span>
+										? This action cannot be undone.
+									</div>
+							    </div>
+								<div class="modal-footer">
+									<button type="button" class="btn btn-link" data-dismiss="modal">Close</button>
+									<button type="submit" class="btn bg-danger">Confirm</button>
+								</div>
+							{{ form_end(beneficiaryDeleteForm) }}
+						</div>
+					</div>
+				</div>
+				<!-- /modal for beneficiary deletion -->
 
 			</div>
 			<!-- /content area -->

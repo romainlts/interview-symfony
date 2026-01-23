@@ -60,6 +60,18 @@ async function loadDatabaseBeneficiaries() {
     }
 }
 
+function initDeleteModal() {
+    $('#modal_beneficiary_deletion').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const beneficiaryId = button.data('id');
+        const beneficiaryName = button.data('name');
+
+        const modal = $(this);
+        modal.find('#beneficiary-delete-id').val(beneficiaryId);
+        modal.find('#beneficiary-delete-name').text(beneficiaryName);
+    });
+}
+
 function createBeneficiaryCard(beneficiary) {
     const avatarEndpoint = 'https://api.dicebear.com/8.x/avataaars/svg?eyes=hearts,happy,default,side,wink&mouth=smile,default,twinkle,serious&seed=';
     const formatted_date = beneficiary.createdAt ? new Intl.DateTimeFormat('en-EN', {dateStyle: 'short', timeStyle: 'short'}).format(new Date(beneficiary.createdAt)) : 'undefined';
@@ -74,6 +86,9 @@ function createBeneficiaryCard(beneficiary) {
                     <h6 class="font-weight-semibold mb-0">${beneficiary.name}</h6>
                     <span class="d-block text-muted">creator email: ${beneficiary.creatorEmail}</span>
                     <span class="d-block text-muted">creation date: ${formatted_date}</span>
+                    <div class="list-icons list-icons-extended mt-3">
+                        <a href="javascript:;" class="list-icons-item" data-popup="tooltip" title="Delete" data-id="${beneficiary.id}" data-name="${beneficiary.name}" data-toggle="modal" data-target="#modal_beneficiary_deletion"><i class="icon-trash"></i></a>
+                    </div>
                 </div>
             </div>
         </div>
@@ -86,4 +101,5 @@ function createBeneficiaryCard(beneficiary) {
 document.addEventListener('DOMContentLoaded', function () {
     SearchNonPersistedBeneficiaries();
     loadDatabaseBeneficiaries();
+    initDeleteModal();
 });

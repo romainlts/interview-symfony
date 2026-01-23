@@ -16,6 +16,7 @@ final class DashboardController extends AbstractController
      * Displays a list of non-persisted beneficiaries with generated avatars
      * Displays a list of persisted beneficiaries from the database
      * Renders the form to create a new Beneficiary entity
+     * Renders the form to delete an existing Beneficiary entity
      *
      * @param Generator $faker Faker service for generating fake data
      * @return Response The rendered dashboard template
@@ -36,16 +37,21 @@ final class DashboardController extends AbstractController
             ];
         }
 
+        // form for adding a new Beneficiary
         $beneficiary = new Beneficiary();
         $beneficiary->setName($faker->firstName());
         $beneficiaryForm = $this->createForm(BeneficiaryType::class, $beneficiary, [
             'action' => $this->generateUrl('beneficiary_create')
         ]);
 
+        // form for deleting a Beneficiary
+        $beneficiaryDeleteForm = $this->createFormBuilder()->setAction($this->generateUrl('beneficiary_delete'))->add('id')->getForm();
+
         return $this->render('dashboard.html.twig', [
             'avatarEndpoint' => $avatarEndpoint,
             'nonPersistedBeneficiaries' => $nonPersistedBeneficiaries,
             'beneficiaryForm' => $beneficiaryForm->createView(),
+            'beneficiaryDeleteForm' => $beneficiaryDeleteForm->createView(),
         ]);
     }
 }
