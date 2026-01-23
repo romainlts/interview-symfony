@@ -34,9 +34,22 @@ function SearchNonPersistedBeneficiaries() {
     });
 }
 
-async function loadDatabaseBeneficiaries() {
+function SearchPersistedBeneficiaries() {
+    const searchBar = document.getElementById('search-persisted');
+
+    searchBar.addEventListener('input', (e) => {
+        const search = e.target.value.toLowerCase();
+        loadDatabaseBeneficiaries(search);
+    });
+}
+
+async function loadDatabaseBeneficiaries(search = '') {
     try {
-        const response = await fetch('/api/beneficiaries', {
+        let url = '/api/beneficiaries';
+        if (search) {
+            url += `?name=${encodeURIComponent(search)}`;
+        }
+        const response = await fetch(url, {
             headers: {
                 'Accept': 'application/ld+json'
             }
@@ -111,6 +124,7 @@ function createBeneficiaryCard(beneficiary) {
 // ------------------------------
 document.addEventListener('DOMContentLoaded', function () {
     SearchNonPersistedBeneficiaries();
+    SearchPersistedBeneficiaries();
     loadDatabaseBeneficiaries();
     initDeleteModal();
 });
