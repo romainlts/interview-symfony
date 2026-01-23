@@ -25,7 +25,7 @@ final class BeneficiaryControllerTest extends WebTestCase
 
         $crawler = $client->request('GET', $dashboardUrl);
 
-        $name = 'Test Beneficiary '.uniqid();
+        $name = 'Test Beneficiary ' . uniqid();
 
         $form = $crawler->selectButton('Submit')->form([
             'beneficiary[name]' => $name,
@@ -94,5 +94,61 @@ final class BeneficiaryControllerTest extends WebTestCase
         $em->clear();
         $deletedBeneficiary = $em->getRepository(Beneficiary::class)->find($beneficiaryId);
         $this->assertNull($deletedBeneficiary, 'Beneficiary should be deleted');
+    }
+
+    /**
+     * Test modification of a beneficiary
+     * 
+     * @return void
+     */
+    public function testUpdateBeneficiary(): void
+    {
+        $client = static::createClient();
+
+        $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
+        $testUser = $userRepository->findOneBy(['email' => 'tester@gmail.com']);
+
+        $this->assertNotNull($testUser, 'Test user not found: ensure fixtures create tester@gmail.com');
+
+        $client->loginUser($testUser);
+
+        // Create a beneficiary to update
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $beneficiary = new Beneficiary();
+        $beneficiary->setName('Test Beneficiary to Update');
+        $beneficiary->setCreatorEmail($testUser->getUserIdentifier());
+        $beneficiary->setCreatedAt(new \DateTimeImmutable());
+
+        $em->persist($beneficiary);
+        $em->flush();
+
+        $beneficiaryId = $beneficiary->getId();
+
+        $router = static::getContainer()->get('router');
+
+        // Get CSRF token from the dashboard page
+        $crawler = $client->request('GET', $router->generate('app_dashboard'));
+        $csrfToken = $crawler->filter('#beneficiary-update-form input[name="form[_token]"]')->attr('value');
+        $this->assertNotEmpty($csrfToken, 'CSRF token not found in update form');
+
+        $client->request('POST', $router->generate('beneficiary_update'), [
+            'form' => [
+                'id' => $beneficiaryId,
+                'name' => 'Updated Beneficiary Name',
+                '_token' => $csrfToken,
+            ],
+        ]);
+
+        $this->assertResponseRedirects();
+        $client->followRedirect();
+        $this->assertResponseIsSuccessful();
+
+        $em->clear();
+        $modifiedBeneficiary = $em->getRepository(Beneficiary::class)->find($beneficiaryId);
+        $this->assertSame('Updated Beneficiary Name', $modifiedBeneficiary->getName());
+
+        $em->remove($modifiedBeneficiary);
+        $em->flush();
     }
 }
