@@ -48,4 +48,63 @@ final class BeneficiaryController extends AbstractController
             ? $this->redirect($referer)
             : $this->redirectToRoute('app_dashboard');
     }
+
+    /**
+     * Handles the deletion of an existing Beneficiary entity
+     *
+     * @param Request $request The current HTTP request
+     * @param EntityManagerInterface $em The entity manager for database operations
+     * @return Response A redirect response to the dashboard or referer
+     */
+    #[Route('/beneficiaries/delete', name: 'beneficiary_delete', methods: ['POST'])]
+    public function delete(Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createFormBuilder()
+            ->setAction($this->generateUrl('beneficiary_delete'))
+            ->add('id')
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'Invalid form submission.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $id = $form->get('id')->getData();
+
+        if (!$id) {
+            $this->addFlash('error', 'Missing beneficiary id.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $beneficiary = $em->getRepository(Beneficiary::class)->find($id);
+
+        if(!$beneficiary) {
+            $this->addFlash('error', 'Beneficiary not found.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $em->remove($beneficiary);
+        $em->flush();
+
+        $this->addFlash('success', 'Beneficiary deleted successfully.');
+
+        return $this->redirectToRefererOrDashboard($request);
+    }
+
+    /**
+     * Redirects to the referer URL if available, otherwise to the dashboard
+     *
+     * @param Request $request The current HTTP request
+     * @return Response A redirect response
+     */
+    private function redirectToRefererOrDashboard(Request $request): Response
+    {
+        $referer = $request->headers->get('referer');
+
+        return $referer
+            ? $this->redirect($referer)
+            : $this->redirectToRoute('app_dashboard');
+    }
 }
