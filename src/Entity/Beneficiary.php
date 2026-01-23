@@ -6,6 +6,7 @@ use ApiPlatform\Metadata\ApiResource;
 use App\Repository\BeneficiaryRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ApiResource(
     security: "is_granted('ROLE_USER')",
@@ -22,6 +23,13 @@ class Beneficiary
     private ?int $id = null;
 
     #[ORM\Column(type: "string", length: 255)]
+    #[Assert\NotBlank(message: 'Name is required.')]
+    #[Assert\Length(
+        min: 2,
+        max: 255,
+        minMessage: 'Name must be at least {{ limit }} characters.',
+        maxMessage: 'Name cannot exceed {{ limit }} characters.'
+    )]
     #[Groups(['beneficiary:read', 'beneficiary:write'])]
     private $name;
 
