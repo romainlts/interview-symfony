@@ -26,14 +26,27 @@
 		<script src="{{ asset('assets/js/plugins/fab.min.js') }}"></script>
 		<script src="{{ asset('assets/js/plugins/ripple.min.js') }}"></script>
 		<script src="{{ asset('assets/js/plugins/uniform.min.js') }}"></script>
+		<script src="{{ asset('assets/js/plugins/pnotify.min.js') }}"></script>
 		<!-- /core JS files -->
 
 		<!-- Theme JS files -->
 		<script src="{{ asset('assets/js/app.js') }}"></script>
+		<script src="{{ asset('assets/js/custom.js') }}"></script>
 		<!-- /theme JS files -->
 		{% endblock %}
 	</head>
 	<body class="{% block body_class %}{% endblock %}"> 
+
+		{% set success = app.flashes('success') %}
+		{% set error = app.flashes('error') %}
+
+		{% if success is not empty or error is not empty %}
+		<div id="flash-messages" hidden
+			data-success='{{ success|json_encode|e("html_attr") }}'
+			data-error='{{ error|json_encode|e("html_attr") }}'>
+		</div>
+		{% endif %}
+
 	    {% block body %}{% endblock %}
 		{% block footer %}{% endblock %}
     </body>
