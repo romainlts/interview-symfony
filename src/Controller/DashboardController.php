@@ -45,13 +45,24 @@ final class DashboardController extends AbstractController
         ]);
 
         // form for deleting a Beneficiary
-        $beneficiaryDeleteForm = $this->createFormBuilder()->setAction($this->generateUrl('beneficiary_delete'))->add('id')->getForm();
+        $beneficiaryDeleteForm = $this->createFormBuilder()
+            ->setAction($this->generateUrl('beneficiary_delete'))
+            ->add('id')
+            ->getForm();
+
+        // form for updating a Beneficiary
+        $beneficiaryUpdateForm = $this->createFormBuilder()
+            ->setAction($this->generateUrl('beneficiary_update'))
+            ->add('id')
+            ->add('name')
+            ->getForm();
 
         return $this->render('dashboard.html.twig', [
             'avatarEndpoint' => $avatarEndpoint,
             'nonPersistedBeneficiaries' => $nonPersistedBeneficiaries,
             'beneficiaryForm' => $beneficiaryForm->createView(),
             'beneficiaryDeleteForm' => $beneficiaryDeleteForm->createView(),
+            'beneficiaryUpdateForm' => $beneficiaryUpdateForm->createView(),
         ]);
     }
 }

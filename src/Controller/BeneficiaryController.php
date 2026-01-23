@@ -94,6 +94,52 @@ final class BeneficiaryController extends AbstractController
     }
 
     /**
+     * Handles updating an existing Beneficiary entity
+     *
+     * @param Request $request The current HTTP request
+     * @param EntityManagerInterface $em The entity manager for database operations
+     * @return Response A redirect response to the dashboard or referer
+     */
+    #[Route('/beneficiaries/update', name: 'beneficiary_update', methods: ['POST'])]
+    public function update(Request $request, EntityManagerInterface $em): Response
+    {
+        $form = $this->createFormBuilder()
+            ->setAction($this->generateUrl('beneficiary_update'))
+            ->add('id')
+            ->add('name')
+            ->getForm();
+
+        $form->handleRequest($request);
+
+        if (!$form->isSubmitted() || !$form->isValid()) {
+            $this->addFlash('error', 'Invalid form submission.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $id = $form->get('id')->getData();
+        $name = $form->get('name')->getData();
+
+        if (!$id || !$name) {
+            $this->addFlash('error', 'Missing beneficiary id or name.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $beneficiary = $em->getRepository(Beneficiary::class)->find($id);
+
+        if (!$beneficiary) {
+            $this->addFlash('error', 'Beneficiary not found.');
+            return $this->redirectToRefererOrDashboard($request);
+        }
+
+        $beneficiary->setName($name);
+        $em->flush();
+
+        $this->addFlash('success', 'Beneficiary updated successfully.');
+
+        return $this->redirectToRefererOrDashboard($request);
+    }
+
+    /**
      * Redirects to the referer URL if available, otherwise to the dashboard
      *
      * @param Request $request The current HTTP request
