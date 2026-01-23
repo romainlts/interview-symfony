@@ -62,6 +62,8 @@ async function loadDatabaseBeneficiaries() {
 
 function createBeneficiaryCard(beneficiary) {
     const avatarEndpoint = 'https://api.dicebear.com/8.x/avataaars/svg?eyes=hearts,happy,default,side,wink&mouth=smile,default,twinkle,serious&seed=';
+    const formatted_date = beneficiary.createdAt ? new Intl.DateTimeFormat('en-EN', {dateStyle: 'short', timeStyle: 'short'}).format(new Date(beneficiary.createdAt)) : 'undefined';
+
     return `
         <div class="col-xl-2 col-sm-6 beneficiary-persisted" data-name="${beneficiary.name.toLowerCase()}" data-id="${beneficiary.id}">
             <div class="card">
@@ -70,6 +72,8 @@ function createBeneficiaryCard(beneficiary) {
                         <img class="img-fluid rounded-circle" src="${avatarEndpoint + encodeURIComponent(beneficiary.name)}" width="170" height="170" alt="avatar-${beneficiary.name}">
                     </div>
                     <h6 class="font-weight-semibold mb-0">${beneficiary.name}</h6>
+                    <span class="d-block text-muted">creator email: ${beneficiary.creatorEmail}</span>
+                    <span class="d-block text-muted">creation date: ${formatted_date}</span>
                 </div>
             </div>
         </div>
