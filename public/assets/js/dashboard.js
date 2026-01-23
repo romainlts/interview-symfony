@@ -70,6 +70,16 @@ function initDeleteModal() {
         modal.find('#beneficiary-delete-id').val(beneficiaryId);
         modal.find('#beneficiary-delete-name').text(beneficiaryName);
     });
+
+    $('#modal_beneficiary_modification').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const beneficiaryId = button.data('id');
+        const beneficiaryName = button.data('name');
+
+        const modal = $(this);
+        modal.find('#beneficiary-update-id').val(beneficiaryId);
+        modal.find('#beneficiary-update-name').val(beneficiaryName);
+    });
 }
 
 function createBeneficiaryCard(beneficiary) {
@@ -87,6 +97,7 @@ function createBeneficiaryCard(beneficiary) {
                     <span class="d-block text-muted">creator email: ${beneficiary.creatorEmail}</span>
                     <span class="d-block text-muted">creation date: ${formatted_date}</span>
                     <div class="list-icons list-icons-extended mt-3">
+                        <a href="javascript:;" class="list-icons-item" data-popup="tooltip" title="Modify" data-id="${beneficiary.id}" data-name="${beneficiary.name}" data-toggle="modal" data-target="#modal_beneficiary_modification"><i class="icon-pencil7"></i></a>
                         <a href="javascript:;" class="list-icons-item" data-popup="tooltip" title="Delete" data-id="${beneficiary.id}" data-name="${beneficiary.name}" data-toggle="modal" data-target="#modal_beneficiary_deletion"><i class="icon-trash"></i></a>
                     </div>
                 </div>
