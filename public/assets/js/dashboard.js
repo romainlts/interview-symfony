@@ -160,6 +160,31 @@ function createBeneficiary() {
     }
 }
 
+// Delete Beneficiary via API
+// ------------------------------
+function deleteBeneficiary() {
+    const deleteBtn = document.getElementById('beneficiary-delete-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', async function () {
+            const deleteId = document.getElementById('beneficiary-delete-id').value;
+            try {
+                const response = await fetch(`/api/beneficiaries/${deleteId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Accept': 'application/ld+json',
+                    }
+                });
+
+                if (!response.ok) throw new Error('Error deleting beneficiary');
+                $('#modal_beneficiary_deletion').modal('hide');
+                loadDatabaseBeneficiaries();
+            } catch (e) {
+                console.log('Error: ' + e.message);
+            }
+        });
+    }
+}
+
 
 // Initialize module
 // ------------------------------
@@ -169,4 +194,5 @@ document.addEventListener('DOMContentLoaded', function () {
     loadDatabaseBeneficiaries();
     initDeleteModal();
     createBeneficiary();
+    deleteBeneficiary();
 });
