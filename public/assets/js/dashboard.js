@@ -119,6 +119,47 @@ function createBeneficiaryCard(beneficiary) {
     `;
 }
 
+// Create Beneficiary via API
+// ------------------------------
+function createBeneficiary() {
+    const createBtn = document.getElementById('beneficiary-create-btn');
+    if (createBtn) {
+        createBtn.addEventListener('click', async function () {
+            const nameInput = document.querySelector('input[name="beneficiary[name]"]');
+            if (!nameInput) {
+                console.log('Champ name introuvable.');
+                return;
+            }
+            const name = nameInput.value.trim();
+            if (!name) {
+                alert('Please, enter a name for the beneficiary.');
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/beneficiaries', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/ld+json',
+                        'Content-Type': 'application/ld+json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                if (response.ok) {
+                    $('#modal_form_vertical').modal('hide');
+                    loadDatabaseBeneficiaries();
+                } else {
+                    const data = await response.json();
+                    console.log('Erreur API: ' + (data.detail || response.statusText));
+                }
+            } catch (e) {
+                console.log('Erreur réseau: ' + e.message);
+            }
+        });
+    }
+}
+
 
 // Initialize module
 // ------------------------------
@@ -127,4 +168,5 @@ document.addEventListener('DOMContentLoaded', function () {
     SearchPersistedBeneficiaries();
     loadDatabaseBeneficiaries();
     initDeleteModal();
+    createBeneficiary();
 });
