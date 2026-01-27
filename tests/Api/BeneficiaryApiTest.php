@@ -45,4 +45,42 @@ final class BeneficiaryApiTest extends WebTestCase
         $em->remove($createdBeneficiary);
         $em->flush();
     }
+
+    // Test deletion of beneficiary via API
+    public function testDeleteBeneficiary(): void
+    {
+        $client = static::createClient();
+
+        $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
+        $testUser = $userRepository->findOneBy(['email' => 'tester@gmail.com']);
+
+        $this->assertNotNull($testUser, 'Test user not found: ensure fixtures create tester@gmail.com');
+
+        $client->loginUser($testUser);
+
+        // Create a beneficiary to delete
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $beneficiary = new Beneficiary();
+        $beneficiary->setName('Test Beneficiary to Delete' . uniqid());
+        $beneficiary->setCreatorEmail($testUser->getUserIdentifier());
+        $beneficiary->setCreatedAt(new \DateTimeImmutable());
+
+        $em->persist($beneficiary);
+        $em->flush();
+
+        $id = $beneficiary->getId();
+
+        // Call API to delete beneficiary
+        $client->request('DELETE', '/api/beneficiaries/' . $id, server: [
+            'HTTP_ACCEPT' => 'application/ld+json'
+        ]);
+
+        $this->assertResponseStatusCodeSame(204);
+        $this->assertSame('', (string) $client->getResponse()->getContent());
+
+        $em->clear();
+        $deleted = $em->getRepository(Beneficiary::class)->find($id);
+        $this->assertNull($deleted, 'Beneficiary should be deleted from database');
+    }
 }
