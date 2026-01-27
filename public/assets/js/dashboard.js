@@ -185,6 +185,40 @@ function deleteBeneficiary() {
     }
 }
 
+// Update Beneficiary via API
+// ------------------------------
+function updateBeneficiary() {
+    const updateBtn = document.getElementById('beneficiary-update-btn');
+    if (updateBtn) {
+        updateBtn.addEventListener('click', async function () {
+            const updateId = document.getElementById('beneficiary-update-id').value;
+            
+            const name = document.getElementById('beneficiary-update-name').value.trim();
+            if (!name) {
+                alert('Please, enter a name for the beneficiary.');
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/beneficiaries/${updateId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/ld+json',
+                        'Content-Type': 'application/merge-patch+json'
+                    },
+                    body: JSON.stringify({ name })
+                });
+
+                if (!response.ok) throw new Error('Error updating beneficiary');
+                $('#modal_beneficiary_modification').modal('hide');
+                loadDatabaseBeneficiaries();
+            } catch (e) {
+                console.log('Error: ' + e.message);
+            }
+        });
+    }
+}
+
 
 // Initialize module
 // ------------------------------
@@ -195,4 +229,5 @@ document.addEventListener('DOMContentLoaded', function () {
     initDeleteModal();
     createBeneficiary();
     deleteBeneficiary();
+    updateBeneficiary();
 });
