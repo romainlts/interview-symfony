@@ -83,4 +83,46 @@ final class BeneficiaryApiTest extends WebTestCase
         $deleted = $em->getRepository(Beneficiary::class)->find($id);
         $this->assertNull($deleted, 'Beneficiary should be deleted from database');
     }
+    
+    // Test modification of beneficiary via API
+    public function testUpdateBeneficiary(): void
+    {
+        $client = static::createClient();
+
+        $userRepository = static::getContainer()->get('doctrine')->getRepository(User::class);
+        $testUser = $userRepository->findOneBy(['email' => 'tester@gmail.com']);
+
+        $this->assertNotNull($testUser, 'Test user not found: ensure fixtures create tester@gmail.com');
+
+        $client->loginUser($testUser);
+
+        // Create a beneficiary to update
+        $em = static::getContainer()->get(EntityManagerInterface::class);
+
+        $beneficiary = new Beneficiary();
+        $beneficiary->setName('Test Beneficiary to Update' . uniqid());
+        $beneficiary->setCreatorEmail($testUser->getUserIdentifier());
+        $beneficiary->setCreatedAt(new \DateTimeImmutable());
+
+        $em->persist($beneficiary);
+        $em->flush();
+
+        $id = $beneficiary->getId();
+
+        // Call API to update beneficiary
+        $client->request('PATCH', '/api/beneficiaries/' . $id, server: [
+            'CONTENT_TYPE' => 'application/merge-patch+json',
+            'HTTP_ACCEPT' => 'application/ld+json'
+        ], content: json_encode(['name' => 'Updated Beneficiary Name']));
+
+        $this->assertResponseStatusCodeSame(200);
+
+        $em->clear();
+        $updatedBeneficiary = $em->getRepository(Beneficiary::class)->find($id);
+        $this->assertNotNull($updatedBeneficiary);
+        $this->assertSame('Updated Beneficiary Name', $updatedBeneficiary->getName());
+
+        $em->remove($updatedBeneficiary);
+        $em->flush();
+    }
 }
